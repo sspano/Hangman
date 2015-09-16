@@ -74,7 +74,32 @@ void print_gallows(int num_missed) {
  */
 bool one_game(const char *word) {
 
-    
+    return true;
+}
+
+bool fix_word(char *word){ //make sure all alphabetic characters & strip \n 
+	for (int i = 0; i < strlen(word)-1; i++){
+		if (isalpha(word[i]) == 0){
+			return false;
+		}
+		word[i] = toupper(word[i]);
+	} 
+	//check if last char is  \n, strip if it is
+	if ((strlen(word) > 0) && word[strlen(word)-1] != '\n'){
+		return true;
+	} else if (strlen(word) > 0){ //strip \n in this case
+		word[strlen(word)-1] = '\0';
+		return true;
+	}
+	return false;
+}
+
+wordnode *list_insert(char *word, wordnode *head){
+	//using list_insert_head2 as defined in class, passing in word as value
+	wordnode *new_node = malloc(sizeof(wordnode));
+	strcpy(new_node -> word, word);
+	new_node -> next = head;
+	return new_node;
 }
 
 /* 
@@ -87,14 +112,35 @@ bool one_game(const char *word) {
  * return the linked list of words.
  */
 wordnode *load_words(const char *filename, int *num_words) {
-
+	FILE *raw_words = fopen(filename, "");
+	int size = 256; //arbitrary? what should size be?
+	char *this_line = malloc(size*sizeof(char));
+	fgets(this_line, size, raw_words);
+	*num_words = 0;
+	wordnode *head = malloc(sizeof(wordnode));
+	head = NULL;
+	bool is_valid = true; //checks if each word is valid after run through fix
+	while (this_line != NULL){
+		is_valid = fix_word(this_line);
+		if (is_valid){
+			head = list_insert(this_line, head);
+			*num_words = *num_words +1; //deference to indirectly modify
+		}
+	}
+	return head;
 }
+
 
 /*
  * Completely free and deallocate the linked list of words.
  */
 void free_words(wordnode *wordlist) {
-
+	//using list_destroy code from worksheet
+	while (wordlist != NULL){
+		wordnode *tmp = wordlist;
+		wordlist = wordlist -> next;
+		free(tmp);
+	}
 }
 
 /*
@@ -102,6 +148,7 @@ void free_words(wordnode *wordlist) {
  */
 const char *choose_random_word(wordnode *wordlist, int num_words) {
 
+	return NULL;
 }
 
 
@@ -114,14 +161,14 @@ const char *choose_random_word(wordnode *wordlist, int num_words) {
 int main() {
     srandom(time(NULL));
     int num_words = 0;
-    wordnode *words = load_words("/usr/share/dict/words", &num_words);
+    //wordnode *words = load_words("/usr/share/dict/words", &num_words);
     if (num_words == 0) {
         printf("Didn't load any words?!\n");
         return 0;
     }
-    char *word = choose_random_word(words, num_words);
-    one_game(word);
-    free_words(words);
+    //char *word = choose_random_word(words, num_words);
+    //one_game(word);
+    //free_words(words);
     return 0;
 }
 #endif
