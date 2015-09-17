@@ -127,6 +127,7 @@ wordnode *load_words(const char *filename, int *num_words) {
 		head = list_insert(next_word, head);
 	    	*num_words = *num_words + 1; //dereference to indirectly modify
             }
+            free(next_word);
 	} while (fgets(this_line, size, raw_words) != NULL);
         
         free(this_line);
@@ -140,7 +141,7 @@ wordnode *load_words(const char *filename, int *num_words) {
 void free_words(wordnode *wordlist) {
 	//using list_destroy code from worksheet
 	while (wordlist != NULL){
-		wordnode *tmp = wordlist;
+                wordnode *tmp = wordlist;
 		wordlist = wordlist -> next;
 		free(tmp);
 	}
@@ -150,8 +151,12 @@ void free_words(wordnode *wordlist) {
  * Choose one random word from the linked list and return it.
  */
 const char *choose_random_word(wordnode *wordlist, int num_words) {
-
-	return NULL;
+    int rand_i = random() % num_words ;
+    for (int i = 0; i <rand_i; i++){
+        wordlist = wordlist -> next;
+    }
+    const char *rand_word = wordlist -> word;
+    return rand_word;
 }
 
 
@@ -162,19 +167,20 @@ const char *choose_random_word(wordnode *wordlist, int num_words) {
  */
 #ifndef AUTOTEST
 int main() {
-    //srandom(time(NULL));
+    srandom(time(NULL));
     int num_words = 0;
     wordnode *words = load_words("/usr/share/dict/words", &num_words);
     if (num_words == 0) {
         printf("Didn't load any words?!\n");
         return 0;
     }
-    //char *word = choose_random_word(words, num_words);
+    char *word = choose_random_word(words, num_words);
     //one_game(word);
     //char *test_str = "helLoO\n";
     //char *hopefully_fixed = fix_word(test_str);
     //printf("Test fix_word is 'helLoO', %s %s \n", hopefully_fixed, hopefully_fixed);
     printf("First word is %s \n", words -> word);
+    printf("Random word is %s \n", word);
     free_words(words);
     return 0;
 }
