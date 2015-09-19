@@ -73,8 +73,29 @@ void print_gallows(int num_missed) {
  * and false otherwise.
  */
 bool one_game(const char *word) {
-
-    return true;
+    char state[strlen(word)];
+    for (int i=0; i<strlen(word); i++){
+        state[i] = '_';
+    }//initialize state as a bunch of blanks
+    state[strlen(word)-1] = '\0';//still needs to be valid c string
+    printf("Welcome to Hangman! \n");
+    printf("Your word is:\t%s\n", state);
+    print_gallows(0);
+    printf("Let the fun begin!\n");
+    bool is_over = false; //need a marker for if game over (win or loss)
+    bool did_win = false; //bool that will be returned to indicate win/loss
+    char guessed[26]; //where we store guesses, will never be more than all letters
+    int gi = 0; //index in array of guessed letters
+    while (!is_over){
+        //ask for letter
+        //update state
+        //update list of guessed letters
+        //check if win or loss, update did_win
+        //print congrats or too bad if game over
+        //print gallows
+        is_over = true; //just to escape loop for now
+    }
+    return did_win;
 }
 
 char *fix_word(char *word){ //make sure all alphabetic characters & strip \n
@@ -174,8 +195,8 @@ int main() {
         printf("Didn't load any words?!\n");
         return 0;
     }
-    char *word = choose_random_word(words, num_words);
-    //one_game(word);
+    const char *word = choose_random_word(words, num_words);
+    one_game(word);
     //char *test_str = "helLoO\n";
     //char *hopefully_fixed = fix_word(test_str);
     //printf("Test fix_word is 'helLoO', %s %s \n", hopefully_fixed, hopefully_fixed);
