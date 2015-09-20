@@ -76,20 +76,20 @@ int valid_guess(bool* guess_list, char* current_guess) {
   
   // later on we can add complexity where we return different numbers to indicate different reasons for invalidity (eg. 1 means already guessed 2 means non-alpha char)
     
-  printf("Checking guess...\n");
-  if (strlen(current_guess) !=1) {
+
+  
+  if (strlen(current_guess) != 2 || current_guess[1] != '\n') {
     return 0;
   }
   
-  *current_guess = toupper(*current_guess);
-  if (*current_guess <= 'Z' && *current_guess >= 'A') {
-    printf("Guess is a character.\n");
+  if (isalpha(*current_guess)) {
+    *current_guess = toupper(*current_guess);
     int index = *current_guess - 'A';
+    printf ("You entered: %s\n", current_guess);
     if (guess_list[index]) {
       return 0;
     }
     else {
-      printf("Valid guess\n");
       guess_list[index] = true;
       return 1;
     }
@@ -104,60 +104,21 @@ char prompt_guess(bool* guess_list){
   Prompts user for a guess and returns a valid guess. If invalid (checks validity by calling valid_guess), prompts user continuously for a valid guess.
   */
   int buffer = 256;
-  char current_guess = 'A';
+  char* current_guess = malloc(sizeof(char)*buffer);
   printf ("Enter a character: ");
-  fgets(&current_guess, buffer*sizeof(char), stdin);
-  printf ("You entered: %c\n", current_guess);
-  int valid_guess = valid_guess(guess_list, &current_guess);
-  while (valid_guess != 1){
-    current_guess = 'A';
+  fgets(current_guess, buffer*sizeof(char), stdin);
+  int valid_g = valid_guess(guess_list, current_guess);
+  while (valid_g != 1){
     printf("Invalid Guess. You have either guessed this letter already or entered a non-alphabetic character. \nPlease enter a new character :\t");
-    fgets(&current_guess, buffer*sizeof(char), stdin);
-    current_guess = toupper(current_guess);
-    printf ("You entered: %c\n", current_guess);
-    valid_guess = valid_guess(guess_list, &current_guess);
+    fgets(current_guess, buffer*sizeof(char), stdin);
+    valid_g = valid_guess(guess_list, current_guess);
   }
-  return current_guess;
+  char valid_guess = *current_guess;
+  free(current_guess);
+  return valid_guess;
 }
 
-/*
- * Play one game of Hangperson.  The secret word is passed as a
- * parameter.  The function should return true if the player won,
- * and false otherwise.
- */
-bool one_game(const char *word) {
-    int guess_count = 0;
-    int max_guesses = 7;
-    char* secret_word_cpy = strdup(word);
-    char state[strlen(word) + 1];
-    for (int i=0; i<strlen(word); i++){
-        state[i] = '_';
-    } //initialize state as a bunch of blanks
-    state[strlen(word)] = '\0';
-    printf("Welcome to Hangman! \n");
-    printf("Your word is:\t%s\n", state);
-    print_gallows(guess_count);
-    printf("Let the fun begin!\n");
-   // bool is_over = false; 
-    bool did_win = false; //bool that will be returned
-    bool guessed[26] = {false}; //where we store guesses
-    char current_guess;
-    bool in_word = false; // true if guess is in secret word 
-    while (guess_count < max_guesses){
-      current_guess = prompt_guess(&guessed);
-      in_word = check_word(state, secret_word_cpy, current_guess);
-      if (!in_word){
-        guess_count++;
-      }
-      printf("Your word is:\t%s\n", state);
-      print_gallows(guess_count);
-    }
-    //if check if state == word
-    //  win
-    //else
-    // lose
-  return did_win;
-}
+
 
 bool check_word(char* state, char* word, char current_guess) {
   int letter_count = 0;
@@ -176,6 +137,67 @@ bool check_word(char* state, char* word, char current_guess) {
     return false;
   }
   return true;
+}
+
+void print_guesses(bool* list, int length) {
+/* 
+Prints letters already guessed
+*/
+  printf("You've guessed : ");
+  for (int i = 0; i < length; i++) {
+    if (list[i]) {
+      printf("%c  ", i + 'A');
+    }
+  }
+  printf("\n");
+}
+
+bool one_game(const char *word) {
+/*
+ * Play one game of Hangperson.  The secret word is passed as a
+ * parameter.  The function should return true if the player won,
+ * and false otherwise.
+ */
+  int guess_count = 0;
+  int max_guesses = 7;
+  const int length_of_alpha = 26;
+  char* secret_word_cpy = strdup(word);
+  char state[strlen(word) + 1];
+  for (int i=0; i<strlen(word); i++){
+    state[i] = '_';
+  } //initialize state as a bunch of blanks
+  state[strlen(word)] = '\0';
+  printf("Welcome to Hangman! \n");
+  printf("Your word is:\t%s\n", state);
+  print_gallows(guess_count);
+  printf("Let the fun begin!\n"); 
+  bool did_win = false; //bool that will be returned
+  bool guessed[length_of_alpha] = {false}; //where we store guesses
+  char current_guess;
+  bool in_word = false; // true if guess is in secret word 
+  while (guess_count < max_guesses){
+    current_guess = prompt_guess(guessed);
+    in_word = check_word(state, secret_word_cpy, current_guess);
+    if (!in_word){
+      guess_count++;
+    }
+    printf("Your word is:\t%s\n", state);
+    print_gallows(guess_count);
+    print_guesses(guessed, length_of_alpha);
+    if (strchr(state, '_') == NULL) { // win condition
+      did_win = true;
+      break;
+    }
+    current_guess = 'A';
+  }
+  if (did_win) {
+    printf("Congrats! You won!\nThe secret word was : %s\n", secret_word_cpy);
+  }
+  else {
+    printf("Boo you! You got hanged****.\nThe secret word was : %s\n", secret_word_cpy);
+  }
+  free(secret_word_cpy);
+  return did_win;
 }
 
 
@@ -291,12 +313,8 @@ int main() {
         return 0;
     }
     const char *word = choose_random_word(words, num_words);
+ //   printf("Random word is %s \n", word);
     one_game(word);
-    //char *test_str = "helLoO\n";
-    //char *hopefully_fixed = fix_word(test_str);
-    //printf("Test fix_word is 'helLoO', %s %s \n", hopefully_fixed, hopefully_fixed);
-    printf("First word is %s \n", words -> word);
-    printf("Random word is %s \n", word);
     free_words(words);
     return 0;
 }
