@@ -28,7 +28,7 @@ wordnode *list_insert(char *word, wordnode *head){
 
 
 
-int check_guess(char guess_list[], char guess) {
+int check_guess(bool* guess_list, char guess) {
   /*
   Given a list of guessed letters (organized by ASCII value to index) this function sees if the guess has already been guessed. If it has, it returns a 0, if it is a new guess, this function returns a 1.
   */
@@ -42,7 +42,7 @@ int check_guess(char guess_list[], char guess) {
   return 0;
 }
 
-char prompt_guess(char* guess_list[]){
+char prompt_guess(bool* guess_list){
   /*
   Prompts user for a guess and returns a valid guess. If invalid (checks validity by calling check_guess), prompts user continuously for a valid guess.
   */
@@ -67,8 +67,8 @@ char prompt_guess(char* guess_list[]){
 int main() {
  
   char guess;
-  char guess_list[126] = {0};
-  guess = prompt_guess(&guess_list);
+  bool guess_list[126] = {0};
+  guess = prompt_guess(guess_list);
   
   return 0;
   

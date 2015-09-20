@@ -158,8 +158,8 @@ char *fix_word(char *word){
 	//check if last char is  \n, strip if it is
 	if (strlen(word) > 0 && word[strlen(word)-1] != '\n'){
     if (isalpha(word[strlen(word)-1])!=0) {  // alpha char
-      ret_word[strlen(word)-1] = toupper(word[strlen(word)-1]);  // SSS
-		  ret_word[strlen(word)] = word[strlen(word)] = '\0';  // SSS
+      ret_word[strlen(word)-1] = toupper(word[strlen(word)-1]); 
+		  ret_word[strlen(word)] = word[strlen(word)] = '\0'; 
     }
     else { // non alpha character
       return NULL;

@@ -142,11 +142,6 @@ HOW TO CALL prompt_guess:
   return 0;
 }
 
-
-
-
-
-
 char *fix_word(char *word){ 
   /* given a word this function returns NULL if the word is non-alphabetic. For alphabetic words, or an alpha word with the last character as a new line , deletes the new line character and returns the word with all uppercase letters
   */
@@ -163,8 +158,8 @@ char *fix_word(char *word){
 	//check if last char is  \n, strip if it is
 	if (strlen(word) > 0 && word[strlen(word)-1] != '\n'){
     if (isalpha(word[strlen(word)-1])!=0) {  // alpha char
-      ret_word[strlen(word)-1] = toupper(word[strlen(word)-1]);  // SSS
-		  ret_word[strlen(word)] = word[strlen(word)] = '\0';  // SSS
+      ret_word[strlen(word)-1] = toupper(word[strlen(word)-1]); 
+		  ret_word[strlen(word)] = word[strlen(word)] = '\0'; 
     }
     else { // non alpha character
       return NULL;
