@@ -202,34 +202,34 @@ bool one_game(const char *word) {
 
 
 
-char *fix_word(char *word){ 
-  /* given a word this function returns NULL if the word is non-alphabetic. For alphabetic words, or an alpha word with the last character as a new line , deletes the new line character and returns the word with all uppercase letters
+bool fix_word(char *word){ 
+  /* given a word this function returns false if the word is non-alphabetic. For alphabetic words, or an alpha word with the last character as a new line , deletes the new line character and updates the word with all uppercase letters
   */
-  char *ret_word = malloc((strlen(word)+1)*sizeof(char));
-	if (strlen(word) == 1 && isalpha(word[0]) == 0) {
-	  return NULL;
-	}
-	for (int i = 0; i < strlen(word)-1; i++) {
-		if (isalpha(word[i]) == 0) {
-			return NULL;
-		}
-		ret_word[i] = toupper(word[i]);
-	}
-	//check if last char is  \n, strip if it is
-	if (strlen(word) > 0 && word[strlen(word)-1] != '\n'){
+  
+  if (strlen(word) == 1 && isalpha(word[0]) == 0) {
+    return false;
+  }
+  for (int i = 0; i < strlen(word)-1; i++) {
+    if (isalpha(word[i]) == 0) {
+      return false;
+    }
+    word[i] = toupper(word[i]);
+  }
+  //check if last char is  \n, strip if it is
+  if (strlen(word) > 0 && word[strlen(word)-1] != '\n'){
     if (isalpha(word[strlen(word)-1])!=0) {  // alpha char
-      ret_word[strlen(word)-1] = toupper(word[strlen(word)-1]); 
-		  ret_word[strlen(word)] = word[strlen(word)] = '\0'; 
+        word[strlen(word)-1] = toupper(word[strlen(word)-1]); 
+        word[strlen(word)] = '\0'; 
     }
     else { // non alpha character
-      return NULL;
+        return false;
     }
   }
   else if (strlen(word) > 0 && word[strlen(word)-1] == '\n') {
-		  ret_word[strlen(word)-1] = '\0';
-	}
+    word[strlen(word)-1] = '\0';
+  }
 
-	return ret_word;
+  return true;
 }
 
 
@@ -258,14 +258,14 @@ wordnode *load_words(const char *filename, int *num_words) {
 	*num_words = 0;
 	wordnode *head = malloc(sizeof(wordnode));
 	head = NULL;
-	char *next_word = NULL; //temp variable to store words to be added
+	
+        bool is_valid = false;
         do{
-	    next_word = fix_word(this_line);
-    	    if (next_word != NULL){
-		head = list_insert(next_word, head);
+	    is_valid = fix_word(this_line);
+    	    if (is_valid){
+		head = list_insert(this_line, head);
 	    	*num_words = *num_words + 1; //dereference to indirectly modify
             }
-            free(next_word);
 	} while (fgets(this_line, size, raw_words) != NULL);
         
         free(this_line);
